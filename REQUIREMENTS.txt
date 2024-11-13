@@ -1,23 +1,19 @@
 To run this notebook:
-1. Install python3.11
+1. Install python3.6
 
 
 2. run this block in terminal
-python3.11 -m venv uv
-source uv/bin/activate
-pip install jupyter
+conda create -n py36 python=3.6
+conda activate py36
+
 pip install numpy
 pip install pandas
 pip install scipy==1.12
-pip install ipykernel
 pip install neo4j
 pip install tqdm
 pip install pyarrow
 pip install fasttext
-pip install scipy
-
-python -m ipykernel install --user --name uv --display-name "Python 3.11 (uv)"
-
+pip install stellargraph
 ###TO GET STARTED (MAC)
 
 1. Download Neo4j Desktop here: 
