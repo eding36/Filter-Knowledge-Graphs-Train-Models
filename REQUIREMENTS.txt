@@ -1,0 +1,38 @@
+To run this notebook:
+1. Install python3.11
+
+
+2. run this block in terminal
+python3.11 -m venv uv
+source uv/bin/activate
+pip install jupyter
+pip install numpy
+pip install pandas
+pip install scipy==1.12
+pip install ipykernel
+pip install neo4j
+pip install tqdm
+pip install pyarrow
+pip install fasttext
+pip install scipy
+
+python -m ipykernel install --user --name uv --display-name "Python 3.11 (uv)"
+
+###TO GET STARTED (MAC)
+
+1. Download Neo4j Desktop here: 
+
+https://neo4j.com/download/?utm_source=GSearch&utm_medium=PaidSearch&utm_campaign=Evergreen&utm_content=AMS-Search-SEMCE-DSA-None-SEM-SEM-NonABM&utm_term=&utm_adgroup=DSA&gad_source=1&gclid=CjwKCAjw-JG5BhBZEiwAt7JR64nRYIzzywjpEq-GBKd2S3akFG5ty7E3Nh2zCMzAy6ifS-yArIRQexoCaYQQAvD_BwE 
+
+2. Make a new project
+
+3. Create new DBMS using the “Add” sign. Select “Local DBMS”. Set password to “password”.
+
+4. Download the baseline ROBOKOPKG dump file here: 
+
+https://stars.renci.org/var/plater/bl-4.2.1/RobokopKG/4901b2bc764444ea/graph_4901b2bc764444ea.db.dump
+
+5. Under the files tab in Neo4j desktop, click reveal files in Finder, and move your dump file to that directory
+
+6. Under the files tab, you should now see the robokopKG dump file. Hover over the file and click on the 3 dots on the right. Select “import dump into existing DBMS” and select the DBMS you just made. Name the database “robokopkg”. Press “Open” on your DBMS and you should be good to go. 
+
