@@ -11,7 +11,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import fasttext
 
-model = fasttext.load_model(os.path.dirname(os.getcwd())+"/BioWordVec_PubMed_MIMICIII_d200.bin")
+model = fasttext.load_model(os.path.dirname(os.getcwd())+"/biowordvec model/BioWordVec_PubMed_MIMICIII_d200.bin")
 
 
 def generate_phrase_vector(phrase):
@@ -21,7 +21,7 @@ def generate_phrase_vector(phrase):
         vector = np.random.rand(200).tolist()
     return vector
 
-input_file = os.path.dirname(os.getcwd())+"/all_node_ids_mapped_to_node_names.parquet"
+input_file = os.path.dirname(os.getcwd())+"/rkg-text_mining/all_node_ids_mapped_to_node_names.parquet"
 df = pd.read_parquet(input_file)
 
 vectors = df['node_name'].apply(generate_phrase_vector)
@@ -33,5 +33,5 @@ vectors_df = pd.DataFrame(vectors.tolist(), columns=[f'vector_{i+1}' for i in ra
 output_df = pd.concat([df['node_id'], vectors_df], axis=1)
 
 # Save the resulting DataFrame to a new Parquet file
-output_file = os.path.dirname(os.getcwd())+"biowordvec_node_embeddings.parquet"
+output_file = os.path.dirname(os.getcwd())+"/rkg-text_mining/biowordvec_node_embeddings.parquet"
 output_df.to_parquet(output_file, index=False)

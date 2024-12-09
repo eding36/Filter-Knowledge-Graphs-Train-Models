@@ -1,14 +1,14 @@
 ####HELPER QUERIES
 """
-//check if node id exists
+#check if node id exists
 MATCH (n {id: ''})
 RETURN n LIMIT 1;
 
-// check if edge exists
+# check if edge exists
 MATCH (a {id: ''})-[r]-(b {id: ''})
 RETURN r LIMIT 1
 
-//clear all nodes and relationships
+# clear all nodes and relationships
 MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r
 
 """
@@ -117,13 +117,7 @@ def remove_island_nodes(driver):
         session.run(cypher)
     print("Nodes with no connections removed successfully")
 
-def get_unique_nodes():   
-    query = "MATCH (n) RETURN DISTINCT n.id AS node_id, n.name AS node_name"
-    with driver.session() as session:
-        result = session.run(query)
-        data = [(record["node_id"], record["node_name"]) for record in result]
-    df = pd.DataFrame(data, columns = ["node_id", "node_name"])
-    df.to_parquet(os.path.dirname(os.getcwd())+"all_node_ids_mapped_to_node_names.parquet")
+
 
 def get_therapeutic_triples():   
     query = """MATCH (c:`biolink:ChemicalEntity`)-[r0:`biolink:directly_physically_interacts_with`]-(g:`biolink:GeneOrGeneProduct`)-[r1]-(d:`biolink:DiseaseOrPhenotypicFeature`), (c)-[r2:`biolink:treats`]-(d) WHERE properties(c)["CHEBI_ROLE_pharmaceutical"] IS NOT NULL AND properties(r2)["primary_knowledge_source"] IN ["infores:drugcentral", "everycure_indication_list"] RETURN DISTINCT c.name, c.id, g.name, g.id, d.name, d.id"""
@@ -133,17 +127,17 @@ def get_therapeutic_triples():
     df = pd.DataFrame(data, columns = ["drug_name", "drug_id", "target_name", "target_id", "disease_name", "disease_id"])
     df.to_csv(os.path.dirname(os.getcwd())+"therapeutic_triples_name_id.csv")
 
-drug_disease_df = pd.read_csv(os.path.dirname(os.getcwd()) + '/edges_to_add/drug-disease-list-treats.csv')
+drug_disease_df = pd.read_csv(os.path.dirname(os.getcwd()) + '/rkg+ttd+d-d-text_mining/edges_to_add/drug-disease-list-treats.csv')
 unique_drugs_everycure = get_unique_entities(drug_disease_df, ['drug_id', 'drug_name'])
 
 unique_diseases_everycure = get_unique_entities(drug_disease_df, ['disease_id', 'disease_name'])
 
-drug_target_df = pd.read_csv(os.path.dirname(os.getcwd()) + '/edges_to_add/normalized_ttd_drug_target_edges.csv')
+drug_target_df = pd.read_csv(os.path.dirname(os.getcwd()) + '/rkg+ttd+d-d-text_mining/edges_to_add/normalized_ttd_drug_target_edges.csv')
 unique_drugs_ttd = get_unique_entities(drug_target_df, ['drug_id', 'drug_name'])
 
 unique_targets_ttd = get_unique_entities(drug_target_df, ['target_id', 'target_name'])
 
-target_disease_df = pd.read_csv(os.path.dirname(os.getcwd()) + '/edges_to_add/normalized_ttd_target_disease_edges.csv')
+target_disease_df = pd.read_csv(os.path.dirname(os.getcwd()) + '/rkg+ttd+d-d-text_mining/edges_to_add/normalized_ttd_target_disease_edges.csv')
 unique_targets_ttd_2 = get_unique_entities(target_disease_df, ['target_id', 'target_name'])
 
 unique_diseases_ttd = get_unique_entities(target_disease_df, ['disease_id', 'disease_name'])
@@ -180,22 +174,33 @@ if __name__ == "__main__":
     
     # Close the connection after processing
     
-    get_unique_nodes()
     get_therapeutic_triples()
     driver.close()
 
-###RUN THIS CYPHER QUERY IN NEO4J BROWSER TO EXPORT GRAPH TO CSV
+###IMPORTANT! RUN THIS CYPHER QUERY IN NEO4J BROWSER TO EXPORT GRAPH TO CSV
+##FIRST, you must make an empty apoc.conf file in the directory (THIS IS ONLY FOR MAC):
+# Neo4J Desktop/Application/relate-data/dmbss/your_dbms_version/conf/
+# with the line: apoc.export.file.enabled=true
+
+"""
+CALL apoc.export.csv.query(
+    "
+    MATCH (n) RETURN DISTINCT n.id AS id, labels(n) AS category, n.name AS name",
+    "filtered_graph_nodes.csv", 
+    {useTypes: true, quotes: false, delim: "\t"}
+)
+"""
 """"
 CALL apoc.export.csv.query(
     "
     MATCH (n)-[r]->(m)
-    RETURN n.id AS node1_id, m.id AS node2_id, type(r) AS relationship_type
+    RETURN n.id AS source, m.id AS target, type(r) AS predicate
     ",
-    "enriched_refined_robokop_kg.csv", 
-    {useTypes: true, quotes: false}
+    "filtered_graph_edges.csv", 
+    {useTypes: true, quotes: false, delim: "\t"}
 )
 """
-###MOVE CSV FILE FROM:
+###MOVE TXT FILES FROM:
 # Neo4j Desktop/Application/relate-data/dbmss/dbms-cf8ab5ab-90f0-4054-ba35-5bd3107d01b4/import
 ### TO:
 # this directory
